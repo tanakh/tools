@@ -20,7 +20,10 @@ jobs:
         run: |
           npm install wasm-pack
           ./node_modules/.bin/wasm-pack build --target=web --out-name wasm --out-dir ./static
-          ls static
+          
+      - name: Check
+        run: |
+          ls -alFh static
 
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@3.5.9
