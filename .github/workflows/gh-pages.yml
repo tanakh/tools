@@ -18,7 +18,7 @@ jobs:
 
       - name: Install and build
         run: |
-          npm install -g wasm-pack
+          npm install wasm-pack
           wasm-pack build --target=web --out-name wasm --out-dir ./static
 
       - name: Deploy
