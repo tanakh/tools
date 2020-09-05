@@ -24,7 +24,6 @@ pub enum Msg {
 
 impl Component for Model {
     type Message = Msg;
-
     type Properties = Props;
 
     fn create(props: Self::Properties, link: ComponentLink<Self>) -> Self {

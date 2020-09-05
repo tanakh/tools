@@ -1,64 +1,46 @@
-use crate::util::TypedNodeRef;
+use crate::util::horizontal_field;
 use num_bigint::BigUint;
-use web_sys::HtmlInputElement;
 use yew::prelude::*;
 
-const BASES: &[usize] = &[2, 8, 10, 16, 36];
+const BASES: &[u32] = &[2, 8, 10, 16, 36];
 
 pub struct Model {
     link: ComponentLink<Self>,
-    text: Vec<TypedNodeRef<HtmlInputElement>>,
+    props: Props,
 }
 
 pub enum Msg {
-    Input(usize),
+    Input { base: u32, event: InputData },
+}
+
+#[derive(Properties, Clone)]
+pub struct Props {
+    #[prop_or_default]
+    value: Option<BigUint>,
+    #[prop_or_default]
+    error: Option<u32>,
 }
 
 impl Component for Model {
     type Message = Msg;
-    type Properties = ();
+    type Properties = Props;
 
-    fn create(_props: Self::Properties, link: yew::ComponentLink<Self>) -> Self {
-        Self {
-            link,
-            text: (0..=36).map(|_| Default::default()).collect(),
-        }
+    fn create(props: Self::Properties, link: yew::ComponentLink<Self>) -> Self {
+        Self { link, props }
     }
 
     fn update(&mut self, msg: Self::Message) -> yew::ShouldRender {
         match msg {
-            Msg::Input(base) => {
-                let text = self.text[base].get().value();
-                self.text[base]
-                    .get()
-                    .class_list()
-                    .remove_1("is-danger")
-                    .unwrap();
+            Msg::Input { base, event } => {
+                let text = event.value;
 
                 if text.is_empty() {
-                    for &base in BASES.iter() {
-                        self.text[base].get().set_value("");
-                    }
-                    return true;
-                }
-
-                let num = BigUint::parse_bytes(text.as_bytes(), base as u32);
-
-                if num.is_none() {
-                    self.text[base]
-                        .get()
-                        .class_list()
-                        .add_1("is-danger")
-                        .unwrap();
-                    return true;
-                }
-
-                let num = num.unwrap();
-
-                for &base in BASES.iter() {
-                    self.text[base]
-                        .get()
-                        .set_value(&num.to_str_radix(base as u32));
+                    self.props.value = None;
+                } else if let Some(num) = BigUint::parse_bytes(text.as_bytes(), base) {
+                    self.props.value = Some(num);
+                    self.props.error = None;
+                } else {
+                    self.props.error = Some(base);
                 }
             }
         }
@@ -73,22 +55,17 @@ impl Component for Model {
         html! {
             <>
             {
-                BASES.iter().map(|&base| html!{
-                    <div class="field is-horizontal">
-                        <div class="field-label is-normal">
-                            <label class="label">{format!("base-{}", base)}</label>
-                        </div>
-                        <div class="field-body">
-                            <div class="field">
-                                <div class="control">
-                                    <input class="input" type="text" placeholder="0"
-                                        oninput=self.link.callback(move |_| Msg::Input(base))
-                                        ref=self.text[base].node_ref()/>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                }).collect::<Html>()
+                for BASES.iter().map(move |&base| {
+                    let mut classes = vec!["input"];
+                    if self.props.error == Some(base) {
+                        classes.push("is-danger");
+                    }
+                    horizontal_field(&format!("base-{}", base), html!{
+                        <input class=classes type="text" placeholder="0"
+                            value=self.props.value.clone().map_or("".to_string(), |n| n.to_str_radix(base))
+                            oninput=self.link.callback(move |event| Msg::Input{base, event})/>
+                    })
+                })
             }
             </>
         }
