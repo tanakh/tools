@@ -1,5 +1,5 @@
-use crate::util::TypedNodeRef;
-use web_sys::{HtmlInputElement, HtmlTextAreaElement};
+use crate::util::{horizontal_field, TypedNodeRef};
+use web_sys::HtmlTextAreaElement;
 use yew::prelude::*;
 
 pub struct Model {
@@ -81,42 +81,9 @@ impl Component for Model {
                 </div>
             </div>
 
-            <div class="field is-horizontal">
-                <div class="field-label is-normal">
-                    <label class="label">{"Chars"}</label>
-                </div>
-                <div class="field-body">
-                    <div class="field">
-                        <div class="control">
-                            <input class="input" type="text" value=self.props.chars readonly=true/>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="field is-horizontal">
-                <div class="field-label is-normal">
-                    <label class="label">{"Words"}</label>
-                </div>
-                <div class="field-body">
-                    <div class="field">
-                        <div class="control">
-                            <input class="input" type="text" value=self.props.words readonly=true/>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="field is-horizontal">
-                <div class="field-label is-normal">
-                    <label class="label">{"Lines"}</label>
-                </div>
-                <div class="field-body">
-                    <div class="field">
-                        <div class="control">
-                            <input class="input" type="text" value=self.props.lines readonly=true/>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            { horizontal_field("Chars", html!{<input class="input" type="text" value=self.props.chars readonly=true/>}) }
+            { horizontal_field("Words", html!{<input class="input" type="text" value=self.props.words readonly=true/>}) }
+            { horizontal_field("Lines", html!{<input class="input" type="text" value=self.props.lines readonly=true/>}) }
 
             </>
         }

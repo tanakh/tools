@@ -18,3 +18,20 @@ impl<T: AsRef<web_sys::Node> + From<wasm_bindgen::JsValue>> TypedNodeRef<T> {
         self.0.cast::<T>().unwrap()
     }
 }
+
+pub fn horizontal_field(label: &str, field: Html) -> Html {
+    html! {
+        <div class="field is-horizontal">
+            <div class="field-label is-normal">
+                <label class="label">{ label }</label>
+            </div>
+            <div class="field-body">
+                <div class="field">
+                    <div class="control">
+                        { field }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}

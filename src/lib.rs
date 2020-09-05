@@ -113,6 +113,7 @@ impl Component for Model {
                 <ul class="menu-list">
                     <li><a>{"ASCII converter"}</a></li>
                     <li><a>{"Prime factorization"}</a></li>
+                    <li><a>{"URL encode"}</a></li>
                 </ul>
             </aside>
         };
