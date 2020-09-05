@@ -10,11 +10,14 @@ pub struct Model {
 }
 
 pub enum Msg {
-    Input { base: u32, event: InputData },
+    Input { base: u32, text: String },
+    Uppercase,
 }
 
 #[derive(Properties, Clone)]
 pub struct Props {
+    #[prop_or_default]
+    uppercase: bool,
     #[prop_or_default]
     value: Option<BigUint>,
     #[prop_or_default]
@@ -31,9 +34,7 @@ impl Component for Model {
 
     fn update(&mut self, msg: Self::Message) -> yew::ShouldRender {
         match msg {
-            Msg::Input { base, event } => {
-                let text = event.value;
-
+            Msg::Input { base, text } => {
                 if text.is_empty() {
                     self.props.value = None;
                 } else if let Some(num) = BigUint::parse_bytes(text.as_bytes(), base) {
@@ -42,6 +43,9 @@ impl Component for Model {
                 } else {
                     self.props.error = Some(base);
                 }
+            }
+            Msg::Uppercase => {
+                self.props.uppercase = !self.props.uppercase;
             }
         }
         true
@@ -60,11 +64,29 @@ impl Component for Model {
                     if self.props.error == Some(base) {
                         classes.push("is-danger");
                     }
+                    let value = self.props.value.clone().map_or("".to_string(), |n| n.to_str_radix(base));
+                    let value = if self.props.uppercase {
+                        value.to_uppercase()
+                    } else {
+                        value
+                    };
                     horizontal_field(&format!("base-{}", base), html!{
                         <input class=classes type="text" placeholder="0"
-                            value=self.props.value.clone().map_or("".to_string(), |n| n.to_str_radix(base))
-                            oninput=self.link.callback(move |event| Msg::Input{base, event})/>
+                            value=value
+                            oninput=self.link.callback(move |e: InputData| Msg::Input{base, text: e.value})/>
                     })
+                })
+            }
+            {
+                horizontal_field("", html!{
+                    <label class="checkbox">
+                        <input type="checkbox"
+                            checked=self.props.uppercase
+                            onchange=self.link.callback(|e: ChangeData| {
+                                Msg::Uppercase
+                            })/>
+                        {" Uppercase"}
+                    </label>
                 })
             }
             </>
