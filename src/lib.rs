@@ -10,6 +10,7 @@ mod char_counter;
 mod digest;
 mod regex;
 mod sudden_death;
+mod url_encode;
 mod util;
 
 static ROOT: Option<&str> = option_env!("ROOT");
@@ -34,6 +35,8 @@ enum AppRoute {
     BaseConverter(String),
     #[to = "/{}/#/wc"]
     CharCounter(String),
+    #[to = "/{}/#/url-encode"]
+    UrlEncode(String),
 
     #[to = "/{}/#/regex"]
     Regex(String),
@@ -95,6 +98,7 @@ impl Component for Model {
                 <ul class="menu-list">
                     <li><RouterLink text="Base64" route=AppRoute::Base64(root())/></li>
                     <li><RouterLink text="Message digest (MD5, SHA-1, SHA-2)" route=AppRoute::Digest(root())/></li>
+                    <li><RouterLink text="URL encode" route=AppRoute::UrlEncode(root())/></li>
                     <li><RouterLink text="Base converter" route=AppRoute::BaseConverter(root())/></li>
                     <li><RouterLink text="Character counter" route=AppRoute::CharCounter(root())/></li>
                 </ul>
@@ -113,7 +117,6 @@ impl Component for Model {
                 <ul class="menu-list">
                     <li><a>{"ASCII converter"}</a></li>
                     <li><a>{"Prime factorization"}</a></li>
-                    <li><a>{"URL encode"}</a></li>
                 </ul>
             </aside>
         };
@@ -126,6 +129,7 @@ impl Component for Model {
             AppRoute::Regex(_) => html! {<crate::regex::Model/>},
             AppRoute::SuddenDeath(_) => html! {<crate::sudden_death::Model/>},
             AppRoute::CharCounter(_) => html! {<crate::char_counter::Model/>},
+            AppRoute::UrlEncode(_) => html! {<crate::url_encode::Model/>},
         };
 
         html! {
