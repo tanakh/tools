@@ -11,6 +11,12 @@ mod regex;
 mod sudden_death;
 mod util;
 
+static ROOT: Option<&str> = option_env!("ROOT");
+
+fn root() -> String {
+    ROOT.unwrap_or("static").to_string()
+}
+
 #[wasm_bindgen(start)]
 pub fn run_app() {
     wasm_logger::init(wasm_logger::Config::default());
@@ -41,7 +47,7 @@ impl Component for Model {
 
             <nav class="navbar has-shadow is-spaced">
                 <div class="navbar-brand">
-                    <RouterAnchor<AppRoute> classes="navbar-item" route=AppRoute::Index>
+                    <RouterAnchor<AppRoute> classes="navbar-item" route=AppRoute::Index(root())>
                         <h1 class="title is-3">{"SUGOI Tools"}</h1>
                     </RouterAnchor<AppRoute>>
                 </div>
@@ -69,17 +75,17 @@ impl Component for Model {
                                 {"Tools"}
                             </p>
                             <ul class="menu-list">
-                                <li><RouterLink text="Base64" route=AppRoute::Base64/></li>
-                                <li><RouterLink text="Message digest (MD5, SHA-1, SHA-2)" route=AppRoute::Digest/></li>
-                                <li><RouterLink text="Base converter" route=AppRoute::BaseConverter/></li>
+                                <li><RouterLink text="Base64" route=AppRoute::Base64(root())/></li>
+                                <li><RouterLink text="Message digest (MD5, SHA-1, SHA-2)" route=AppRoute::Digest(root())/></li>
+                                <li><RouterLink text="Base converter" route=AppRoute::BaseConverter(root())/></li>
                             </ul>
 
                             <p class="menu-label">
                                 {"Generators"}
                             </p>
                             <ul class="menu-list">
-                                <li><RouterLink text="Regex Generator" route=AppRoute::Regex/></li>
-                                <li><RouterLink text="突然の死ジェネレーター" route=AppRoute::SuddenDeath/></li>
+                                <li><RouterLink text="Regex Generator" route=AppRoute::Regex(root())/></li>
+                                <li><RouterLink text="突然の死ジェネレーター" route=AppRoute::SuddenDeath(root())/></li>
                             </ul>
 
                             <p class="menu-label">
@@ -98,12 +104,12 @@ impl Component for Model {
                         <Router<AppRoute, ()>
                             render = Router::render(move |s| {
                                 match s {
-                                    AppRoute::Index => html!{<IndexModel/>},
-                                    AppRoute::Base64 => html!{<crate::base64::Model/>},
-                                    AppRoute::Digest => html!{<crate::digest::Model/>},
-                                    AppRoute::BaseConverter => html!{<crate::base_converter::Model/>},
-                                    AppRoute::Regex=>html!{<crate::regex::Model/>},
-                                    AppRoute::SuddenDeath => html!{<crate::sudden_death::Model/>},
+                                    AppRoute::Index(_) => html!{<IndexModel/>},
+                                    AppRoute::Base64(_) => html!{<crate::base64::Model/>},
+                                    AppRoute::Digest(_) => html!{<crate::digest::Model/>},
+                                    AppRoute::BaseConverter(_) => html!{<crate::base_converter::Model/>},
+                                    AppRoute::Regex(_) => html!{<crate::regex::Model/>},
+                                    AppRoute::SuddenDeath(_) => html!{<crate::sudden_death::Model/>},
                                 }
                             })
                         />
@@ -170,20 +176,20 @@ impl Component for RouterLink {
 
 #[derive(Switch, Clone, PartialEq, Debug)]
 enum AppRoute {
-    #[to = "/static/#/base64"]
-    Base64,
-    #[to = "/static/#/digest"]
-    Digest,
-    #[to = "/static/#/base-conv"]
-    BaseConverter,
+    #[to = "/{}/#/base64"]
+    Base64(String),
+    #[to = "/{}/#/digest"]
+    Digest(String),
+    #[to = "/{}/#/base-conv"]
+    BaseConverter(String),
 
-    #[to = "/static/#/regex"]
-    Regex,
-    #[to = "/static/#/sudden-death"]
-    SuddenDeath,
+    #[to = "/{}/#/regex"]
+    Regex(String),
+    #[to = "/{}/#/sudden-death"]
+    SuddenDeath(String),
 
-    #[to = "/static/"]
-    Index,
+    #[to = "/{}/"]
+    Index(String),
 }
 
 struct IndexModel {}
